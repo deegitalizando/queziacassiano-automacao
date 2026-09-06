@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Aprovação de Carrosséis — Quézia Cassiano</title>
+<style>
+  :root{
+    --black:#0A0A0A;
+    --white:#FFFFFF;
+    --gray-dark:#222222;
+    --gray:#6B6B6B;
+    --gray-light:#E5E5E5;
+    --off-white:#F5F5F5;
+    --red:#D23025;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--off-white);
+    color:var(--black);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    background:var(--black);
+    color:var(--white);
+    padding:28px 24px 24px;
+    position:sticky;
+    top:0;
+    z-index:10;
+  }
+  header .wrap{max-width:1040px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  header h1{font-size:19px;margin:0;font-weight:700;letter-spacing:-0.01em;}
+  header p{margin:4px 0 0;color:var(--gray-light);font-size:13px;}
+  header .handle{color:var(--red);font-weight:700;}
+  .refresh-btn{
+    background:transparent;border:1px solid rgba(255,255,255,.35);color:var(--white);
+    padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600;
+  }
+  .refresh-btn:hover{border-color:var(--red);color:var(--red);}
+  main{max-width:1040px;margin:0 auto;padding:24px;}
+  .gate{
+    max-width:360px;margin:120px auto;background:var(--white);border-radius:14px;padding:28px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);text-align:center;
+  }
+  .gate h2{margin:0 0 6px;font-size:17px;}
+  .gate p{color:var(--gray);font-size:13px;margin:0 0 16px;}
+  .gate input{width:100%;padding:11px 12px;border:1px solid var(--gray-light);border-radius:8px;font-size:14px;margin-bottom:10px;}
+  .gate button{width:100%;padding:11px;border:none;border-radius:8px;background:var(--red);color:var(--white);font-weight:700;font-size:14px;cursor:pointer;}
+  .gate button:hover{opacity:.92;}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+  .tab{
+    padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;
+    background:var(--white);color:var(--gray-dark);border:1px solid var(--gray-light);
+  }
+  .tab.active{background:var(--black);color:var(--white);border-color:var(--black);}
+  .tab .count{opacity:.6;margin-left:4px;}
+  .empty{
+    text-align:center;padding:60px 20px;color:var(--gray);font-size:14px;
+  }
+  .card{
+    background:var(--white);border-radius:14px;margin-bottom:18px;overflow:hidden;
+    border:1px solid var(--gray-light);
+  }
+  .card-head{
+    padding:16px 18px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;
+  }
+  .card-title{font-size:15px;font-weight:700;margin:0 0 4px;}
+  .card-meta{font-size:12px;color:var(--gray);display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .badge{
+    display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;
+  }
+  .badge.pending{background:var(--gray-light);color:var(--gray-dark);}
+  .badge.review{background:var(--gray-light);color:var(--gray-dark);}
+  .badge.approved_awaiting_export{background:#e7f4ea;color:#1e7a34;}
+  .badge.posted{background:var(--black);color:var(--white);}
+  .badge.rejected{background:#fbe4e2;color:var(--red);}
+  .badge.changes_requested{background:#fff2d9;color:#8a5a00;}
+  .keyword-chip{
+    background:var(--black);color:var(--red);font-weight:700;font-size:11px;padding:3px 9px;border-radius:6px;
+    letter-spacing:.03em;
+  }
+  .slides{
+    display:flex;gap:10px;padding:0 18px 16px;overflow-x:auto;
+  }
+  .slide-img{
+    width:120px;height:150px;object-fit:cover;border-radius:8px;flex:0 0 auto;
+    border:1px solid var(--gray-light);background:var(--gray-light);
+  }
+  .slide-text{
+    width:120px;height:150px;flex:0 0 auto;border-radius:8px;background:var(--black);color:var(--white);
+    font-size:10.5px;line-height:1.35;padding:10px;display:flex;align-items:center;text-align:center;
+    border:1px solid var(--black);
+  }
+  .slide-text b{color:var(--red);}
+  .caption-box{
+    margin:0 18px 14px;padding:12px 14px;background:var(--off-white);border-radius:10px;
+    font-size:13px;line-height:1.5;color:var(--gray-dark);white-space:pre-wrap;
+  }
+  .review-note{
+    margin:0 18px 14px;padding:10px 14px;background:#fff2d9;border-radius:10px;font-size:12.5px;color:#8a5a00;
+  }
+  .actions{
+    display:flex;gap:8px;padding:0 18px 18px;flex-wrap:wrap;
+  }
+  .btn{
+    border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;
+  }
+  .btn-approve{background:var(--black);color:var(--white);}
+  .btn-approve:hover{background:var(--red);}
+  .btn-reject{background:var(--white);color:var(--red);border:1px solid var(--red);}
+  .btn-reject:hover{background:var(--red);color:var(--white);}
+  .btn-changes{background:var(--white);color:var(--gray-dark);border:1px solid var(--gray-light);}
+  .btn-changes:hover{border-color:var(--black);}
+  .note-row{display:none;padding:0 18px 18px;gap:8px;}
+  .note-row.open{display:flex;flex-wrap:wrap;}
+  .note-row textarea{
+    flex:1 1 220px;min-width:200px;padding:9px 10px;border:1px solid var(--gray-light);border-radius:8px;
+    font-size:13px;font-family:inherit;resize:vertical;min-height:38px;
+  }
+  .note-row .btn{flex:0 0 auto;}
+  .suggest{
+    background:var(--black);color:var(--white);border-radius:14px;padding:22px;margin-top:28px;
+  }
+  .suggest h3{margin:0 0 4px;font-size:15px;}
+  .suggest p{margin:0 0 14px;color:var(--gray-light);font-size:12.5px;}
+  .suggest form{display:flex;gap:8px;flex-wrap:wrap;}
+  .suggest input{
+    flex:1 1 240px;padding:11px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.25);
+    background:rgba(255,255,255,.06);color:var(--white);font-size:13px;
+  }
+  .suggest input::placeholder{color:var(--gray-light);}
+  .suggest button{
+    background:var(--red);color:var(--white);border:none;border-radius:8px;padding:11px 18px;
+    font-weight:700;font-size:13px;cursor:pointer;
+  }
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:var(--black);color:var(--white);padding:11px 20px;border-radius:20px;font-size:13px;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;
+  }
+  .toast.show{opacity:1;}
+  .toast.err{background:var(--red);}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header>
+    <div class="wrap">
+      <div>
+        <h1>Aprovação de Carrosséis <span class="handle">@queziacassiano</span></h1>
+        <p>Revise, aprove ou peça ajustes antes da postagem no Instagram.</p>
+      </div>
+      <button class="refresh-btn" onclick="loadFila()">↻ Atualizar</button>
+    </div>
+  </header>
+  <main>
+    <div class="tabs" id="tabs"></div>
+    <div id="list"></div>
+
+    <div class="suggest">
+      <h3>Sugerir tema pro próximo lote</h3>
+      <p>O tema entra na fila e é considerado na próxima leva de carrosséis.</p>
+      <form onsubmit="return sendSuggestion(event)">
+        <input id="theme-input" type="text" placeholder="Ex: erros comuns ao contemplar a carta" required />
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const FILA_URL = 'https://n8n-n8n.wmbyj1.easypanel.host/webhook/queziacassiano-fila';
+const APROVACAO_URL = 'https://n8n-n8n.wmbyj1.easypanel.host/webhook/queziacassiano-aprovacao';
+const SUGESTAO_URL = 'https://n8n-n8n.wmbyj1.easypanel.host/webhook/queziacassiano-sugestao-tema';
+
+let rows = [];
+let activeTab = 'review';
+
+const STATUS_LABEL = {
+  pending: 'Pendente', review: 'Aguardando revisão', approved_awaiting_export: 'Aprovado (aguardando export)',
+  posted: 'Publicado', rejected: 'Reprovado', changes_requested: 'Ajustes pedidos'
+};
+
+loadFila();
+
+function showToast(msg, isErr){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' err' : '');
+  setTimeout(()=>{ t.className = 'toast'; }, 2600);
+}
+
+async function loadFila(){
+  document.getElementById('list').innerHTML = '<div class="empty">Carregando…</div>';
+  try{
+    const res = await fetch(FILA_URL, { cache: 'no-store' });
+    const data = await res.json();
+    rows = Array.isArray(data) ? data : (data.data || []);
+  }catch(e){
+    document.getElementById('list').innerHTML = '<div class="empty">Não foi possível carregar a fila. Tente atualizar novamente.</div>';
+    return;
+  }
+  renderTabs();
+  renderList();
+}
+
+function renderTabs(){
+  const groups = {};
+  rows.forEach(r => { groups[r.status] = (groups[r.status]||0) + 1; });
+  const order = ['review','pending','approved_awaiting_export','changes_requested','rejected','posted'];
+  const tabsEl = document.getElementById('tabs');
+  tabsEl.innerHTML = order.map(s => `
+    <div class="tab ${activeTab===s?'active':''}" onclick="setTab('${s}')">
+      ${STATUS_LABEL[s]||s} <span class="count">${groups[s]||0}</span>
+    </div>
+  `).join('');
+}
+
+function setTab(s){ activeTab = s; renderTabs(); renderList(); }
+
+function renderList(){
+  const filtered = rows.filter(r => r.status === activeTab).sort((a,b)=> (a.id||0)-(b.id||0));
+  const listEl = document.getElementById('list');
+  if(!filtered.length){
+    listEl.innerHTML = '<div class="empty">Nada aqui no momento.</div>';
+    return;
+  }
+  listEl.innerHTML = filtered.map(cardHtml).join('');
+}
+
+function cardHtml(r){
+  const slides = renderSlides(r);
+  const note = r.review_note ? `<div class="review-note">Nota anterior: ${escapeHtml(r.review_note)}</div>` : '';
+  return `
+    <div class="card" data-id="${r.id}">
+      <div class="card-head">
+        <div>
+          <p class="card-title">${escapeHtml(r.title || '(sem título)')}</p>
+          <div class="card-meta">
+            <span class="badge ${r.status}">${STATUS_LABEL[r.status]||r.status}</span>
+            ${r.keyword ? `<span class="keyword-chip">${escapeHtml(r.keyword)}</span>` : ''}
+            ${r.scheduled_slot ? `<span>${escapeHtml(r.scheduled_slot)}</span>` : ''}
+          </div>
+        </div>
+      </div>
+      ${slides}
+      ${r.caption ? `<div class="caption-box">${escapeHtml(r.caption)}</div>` : ''}
+      ${note}
+      <div class="actions">
+        <button class="btn btn-approve" onclick="decide('${r.id}','approved')">Aprovar</button>
+        <button class="btn btn-changes" onclick="toggleNote('${r.id}')">Pedir ajustes</button>
+        <button class="btn btn-reject" onclick="decide('${r.id}','rejected')">Reprovar</button>
+      </div>
+      <div class="note-row" id="note-row-${r.id}">
+        <textarea id="note-text-${r.id}" placeholder="O que precisa mudar?"></textarea>
+        <button class="btn btn-changes" onclick="decide('${r.id}','changes')">Enviar</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderSlides(r){
+  if(r.image_urls){
+    const urls = r.image_urls.split(',').map(u => u.trim()).filter(Boolean);
+    if(urls.length){
+      return `<div class="slides">${urls.map(u => `<img class="slide-img" src="${u}" loading="lazy" />`).join('')}</div>`;
+    }
+  }
+  if(r.slides_json){
+    try{
+      const slides = JSON.parse(r.slides_json);
+      if(Array.isArray(slides) && slides.length){
+        return `<div class="slides">${slides.map(s => `<div class="slide-text">${escapeHtml(typeof s === 'string' ? s : (s.text || s.headline || JSON.stringify(s)))}</div>`).join('')}</div>`;
+      }
+    }catch(e){}
+  }
+  return '';
+}
+
+function toggleNote(id){
+  const row = document.getElementById('note-row-'+id);
+  row.classList.toggle('open');
+}
+
+async function decide(id, decision){
+  let note = '';
+  if(decision === 'changes'){
+    note = document.getElementById('note-text-'+id).value.trim();
+    if(!note){ showToast('Escreva o que precisa mudar', true); return; }
+  }
+  try{
+    const res = await fetch(APROVACAO_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ row_id: id, decision, note })
+    });
+    if(!res.ok) throw new Error('bad status');
+    showToast(decision === 'approved' ? 'Aprovado!' : decision === 'rejected' ? 'Reprovado.' : 'Ajustes enviados.');
+    await loadFila();
+  }catch(e){
+    showToast('Erro ao enviar decisão. Tente de novo.', true);
+  }
+}
+
+async function sendSuggestion(ev){
+  ev.preventDefault();
+  const input = document.getElementById('theme-input');
+  const theme = input.value.trim();
+  if(!theme) return false;
+  try{
+    const res = await fetch(SUGESTAO_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ theme })
+    });
+    if(!res.ok) throw new Error('bad status');
+    showToast('Tema enviado! Vai entrar no próximo lote.');
+    input.value = '';
+  }catch(e){
+    showToast('Erro ao enviar tema.', true);
+  }
+  return false;
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+</script>
+</body>
+</html>
