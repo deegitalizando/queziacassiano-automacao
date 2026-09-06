@@ -87,9 +87,11 @@
     display:flex;gap:10px;padding:0 18px 16px;overflow-x:auto;
   }
   .slide-img{
-    width:120px;height:150px;object-fit:cover;border-radius:8px;flex:0 0 auto;
-    border:1px solid var(--gray-light);background:var(--gray-light);
+    width:160px;height:200px;object-fit:cover;border-radius:8px;flex:0 0 auto;
+    border:1px solid var(--gray-light);background:var(--gray-light);cursor:zoom-in;
+    transition:transform .12s, box-shadow .12s;
   }
+  .slide-img:hover{transform:scale(1.03);box-shadow:0 6px 16px rgba(0,0,0,.18);}
   .slide-text{
     width:120px;height:150px;flex:0 0 auto;border-radius:8px;background:var(--black);color:var(--white);
     font-size:10.5px;line-height:1.35;padding:10px;display:flex;align-items:center;text-align:center;
@@ -144,6 +146,50 @@
   }
   .toast.show{opacity:1;}
   .toast.err{background:var(--red);}
+
+  .lightbox{
+    display:none; position:fixed; inset:0; background:rgba(6,6,6,.95); z-index:200;
+    align-items:center; justify-content:center; padding:24px;
+  }
+  .lightbox.open{ display:flex; }
+  .lightbox-stage{
+    max-width:96vw; max-height:92vh; overflow:auto; position:relative;
+    display:flex; align-items:center; justify-content:center; border-radius:6px;
+  }
+  .lightbox-img{
+    max-width:96vw; max-height:92vh; object-fit:contain; cursor:zoom-in;
+    border-radius:4px; box-shadow:0 20px 60px rgba(0,0,0,.5); display:block;
+  }
+  .lightbox-img.zoomed{
+    max-width:none; max-height:none; width:1080px; cursor:zoom-out;
+  }
+  .lightbox-close{
+    position:absolute; top:18px; right:18px; width:42px; height:42px; border-radius:50%;
+    background:rgba(255,255,255,.1); color:var(--white); border:1px solid rgba(255,255,255,.25);
+    font-size:20px; cursor:pointer; z-index:201; line-height:1;
+  }
+  .lightbox-close:hover{ background:var(--red); border-color:var(--red); }
+  .lightbox-nav{
+    position:fixed; top:50%; transform:translateY(-50%); width:52px; height:52px; border-radius:50%;
+    background:rgba(255,255,255,.1); color:var(--white); border:1px solid rgba(255,255,255,.25);
+    font-size:22px; cursor:pointer; z-index:201; display:flex; align-items:center; justify-content:center;
+  }
+  .lightbox-nav:hover{ background:var(--red); border-color:var(--red); }
+  .lightbox-prev{ left:18px; }
+  .lightbox-next{ right:18px; }
+  .lightbox-counter{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%); color:var(--gray-light);
+    font-size:13px; font-weight:700; letter-spacing:.03em; z-index:201; background:rgba(255,255,255,.08);
+    padding:6px 14px; border-radius:20px;
+  }
+  .lightbox-hint{
+    position:fixed; bottom:20px; right:20px; color:var(--gray-light); font-size:12px; z-index:201;
+    background:rgba(255,255,255,.08); padding:6px 12px; border-radius:20px;
+  }
+  @media (max-width:640px){
+    .lightbox-nav{ width:42px; height:42px; font-size:18px; }
+    .lightbox-hint{ display:none; }
+  }
 </style>
 </head>
 <body>
@@ -174,6 +220,17 @@
 </div>
 
 <div id="toast" class="toast"></div>
+
+<div id="lightbox" class="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="event.stopPropagation(); closeLightbox()">✕</button>
+  <button class="lightbox-nav lightbox-prev" onclick="event.stopPropagation(); lightboxNav(-1)">‹</button>
+  <div class="lightbox-stage" onclick="event.stopPropagation()">
+    <img id="lightbox-img" class="lightbox-img" onclick="toggleZoom(event)" />
+  </div>
+  <button class="lightbox-nav lightbox-next" onclick="event.stopPropagation(); lightboxNav(1)">›</button>
+  <div class="lightbox-counter" id="lightbox-counter"></div>
+  <div class="lightbox-hint">clique na imagem pra dar zoom · setas pra navegar · Esc pra fechar</div>
+</div>
 
 <script>
 const FILA_URL = 'https://n8n-n8n.wmbyj1.easypanel.host/webhook/queziacassiano-fila';
@@ -270,7 +327,7 @@ function renderSlides(r){
   if(r.image_urls){
     const urls = r.image_urls.split(',').map(u => u.trim()).filter(Boolean);
     if(urls.length){
-      return `<div class="slides">${urls.map(u => `<img class="slide-img" src="${u}" loading="lazy" />`).join('')}</div>`;
+      return `<div class="slides">${urls.map((u,i) => `<img class="slide-img" src="${u}" loading="lazy" onclick="openLightbox('${r.id}', ${i})" />`).join('')}</div>`;
     }
   }
   if(r.slides_json){
@@ -328,6 +385,55 @@ async function sendSuggestion(ev){
   }
   return false;
 }
+
+let lightboxUrls = [];
+let lightboxIndex = 0;
+
+function openLightbox(rowId, index){
+  const r = rows.find(x => String(x.id) === String(rowId));
+  if(!r || !r.image_urls) return;
+  lightboxUrls = r.image_urls.split(',').map(u => u.trim()).filter(Boolean);
+  if(!lightboxUrls.length) return;
+  lightboxIndex = index;
+  renderLightbox();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function lightboxNav(delta){
+  if(!lightboxUrls.length) return;
+  lightboxIndex = (lightboxIndex + delta + lightboxUrls.length) % lightboxUrls.length;
+  renderLightbox();
+}
+
+function renderLightbox(){
+  const img = document.getElementById('lightbox-img');
+  img.classList.remove('zoomed');
+  img.src = lightboxUrls[lightboxIndex];
+  document.getElementById('lightbox-counter').textContent = (lightboxIndex+1) + ' / ' + lightboxUrls.length;
+}
+
+function toggleZoom(ev){
+  ev.stopPropagation();
+  const img = document.getElementById('lightbox-img');
+  img.classList.toggle('zoomed');
+  if(img.classList.contains('zoomed')){
+    img.parentElement.scrollLeft = (img.parentElement.scrollWidth - img.parentElement.clientWidth) / 2;
+    img.parentElement.scrollTop = 0;
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if(!document.getElementById('lightbox').classList.contains('open')) return;
+  if(e.key === 'Escape') closeLightbox();
+  if(e.key === 'ArrowLeft') lightboxNav(-1);
+  if(e.key === 'ArrowRight') lightboxNav(1);
+});
 
 function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
