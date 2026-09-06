@@ -1,0 +1,26 @@
+name: Deploy aprovacao to Hostinger
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'aprovacao/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via rsync/ssh
+        uses: easingthemes/ssh-deploy@v5
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+          REMOTE_HOST: 195.179.237.136
+          REMOTE_PORT: 65002
+          REMOTE_USER: u608402489
+          SOURCE: "aprovacao/"
+          TARGET: "domains/queziacassiano.com/public_html/aprovacao/"
+          ARGS: "-avzr --exclude='.git*'"
